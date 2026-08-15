@@ -446,6 +446,38 @@
       background: url("assets/urbania-hero.jpg") center right / cover no-repeat;
     }
 
+    .hero-slideshow {
+      position: relative;
+      aspect-ratio: 16 / 12;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .slideshow-item {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      animation: slideshow-fade 1s ease-in-out;
+    }
+
+    .slideshow-item.active {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    @keyframes slideshow-fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     .hero-panel-body {
       padding: 22px;
     }
@@ -1280,6 +1312,10 @@
         background-position: center right;
       }
 
+      .hero-slideshow {
+        aspect-ratio: 4 / 4;
+      }
+
       .hero-panel-body,
       .form-card,
       .dark-panel {
@@ -1537,7 +1573,11 @@
         </div>
 
         <aside class="hero-panel desktop-only" aria-label="Urbania rental highlights">
-          <div class="hero-panel-image" role="img" aria-label="Premium Urbania style vehicle for group travel near Tirupati"></div>
+          <div class="hero-slideshow">
+            <img class="slideshow-item" src="assets/urbania/image.png" alt="Urbania vehicle">
+            <img class="slideshow-item" src="assets/urbania/side.png" alt="Urbania side view">
+            <video class="slideshow-item" muted playsinline></video>
+          </div>
           <div class="hero-panel-body">
             <h2>Force Urbania style comfort for family and group travel</h2>
             <p>AC comfort, spacious seating and dependable planning for Tirupati, Tirumala, airport pickup and outstation journeys.</p>
@@ -1653,7 +1693,11 @@
         </div>
 
         <aside class="hero-panel mobile-only" aria-label="Urbania rental highlights">
-          <div class="hero-panel-image" role="img" aria-label="Premium Urbania style vehicle for group travel near Tirupati"></div>
+          <div class="hero-slideshow">
+            <img class="slideshow-item" src="assets/urbania/image.png" alt="Urbania vehicle">
+            <img class="slideshow-item" src="assets/urbania/side.png" alt="Urbania side view">
+            <video class="slideshow-item" muted playsinline></video>
+          </div>
           <div class="hero-panel-body">
             <h2>Force Urbania style comfort for family and group travel</h2>
             <p>AC comfort, spacious seating and dependable planning for Tirupati, Tirumala, airport pickup and outstation journeys.</p>
@@ -1913,6 +1957,51 @@
 
       window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(lines.join("\n")), "_blank", "noopener");
     }
+
+    // Slideshow functionality
+    (function initSlideshow() {
+      const items = document.querySelectorAll(".slideshow-item");
+      let currentIndex = 0;
+
+      if (items.length === 0) return;
+
+      const videoEl = items[2]; // Third item is the video
+
+      async function showNextItem() {
+        // Remove active class from all items
+        items.forEach(item => item.classList.remove("active"));
+
+        // Show current item
+        const currentItem = items[currentIndex];
+        currentItem.classList.add("active");
+
+        if (currentItem.tagName === "VIDEO") {
+          // Load and play video
+          currentItem.src = "assets/urbania/WhatsApp Video 2026-08-15 at 6.28.30 PM.mp4";
+          currentItem.play();
+
+          // Wait for video to end
+          await new Promise(resolve => {
+            currentItem.onended = () => resolve();
+            // Fallback timeout in case video doesn't end properly
+            setTimeout(resolve, 60000);
+          });
+        } else {
+          // Wait 5.5 seconds for images (increased from 4 seconds)
+          await new Promise(resolve => setTimeout(resolve, 5500));
+        }
+
+        // Add 1 second delay between items
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Move to next item
+        currentIndex = (currentIndex + 1) % items.length;
+        showNextItem();
+      }
+
+      // Start the slideshow
+      showNextItem();
+    })();
   </script>
 </body>
 </html>
